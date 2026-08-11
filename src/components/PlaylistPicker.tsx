@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useSyncExternalStore } from "react";
+import { createPortal } from "react-dom";
 import type { FormEvent } from "react";
 import {
   clearCustomPlaylist,
@@ -28,6 +29,11 @@ export default function PlaylistPicker() {
   const [value, setValue] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (!open) return;
@@ -81,6 +87,72 @@ export default function PlaylistPicker() {
     }
   };
 
+  const popoverContent = open && mounted ? (
+    <>
+      <div className="playlist-backdrop" onClick={() => setOpen(false)} />
+      <div className="playlist-popover" role="dialog" aria-label="Playlist">
+        <div className="playlist-popover-title">Playlists</div>
+
+        {customPlaylist && (
+          <div className="playlist-current">
+            <span className="playlist-current-name" title={customPlaylist.name}>
+              {customPlaylist.name}
+            </span>
+            <button
+              type="button"
+              className="playlist-btn playlist-btn-ghost"
+              onClick={() => {
+                clearCustomPlaylist();
+                setOpen(false);
+              }}
+            >
+              Default
+            </button>
+          </div>
+        )}
+
+        <div className="preset-list">
+          {PRESET_PLAYLISTS.map((preset) => (
+            <button
+              key={preset.id}
+              type="button"
+              className={`preset-item${customPlaylist?.id === preset.id ? " active" : ""}`}
+              onClick={() => loadPreset(preset)}
+            >
+              <span className="preset-hindi">{preset.hindiName}</span>
+              <span className="preset-sub">
+                {preset.name} · {preset.tracks.length} songs
+              </span>
+              <span className="preset-desc">{preset.description}</span>
+            </button>
+          ))}
+        </div>
+
+        <div className="playlist-divider" />
+
+        <form className="playlist-form" onSubmit={handleSubmit}>
+          <input
+            className="playlist-input"
+            type="text"
+            value={value}
+            onChange={(event) => setValue(event.target.value)}
+            placeholder="YouTube playlist link"
+            maxLength={300}
+          />
+          <button
+            className="playlist-btn"
+            type="submit"
+            disabled={loading || !value.trim()}
+          >
+            {loading ? "…" : "Load"}
+          </button>
+        </form>
+
+        {error && <div className="playlist-error">{error}</div>}
+      </div>
+    </>
+  ) : null;
+
   return (
     <div className="playlist-picker-wrap">
       <button
@@ -94,78 +166,14 @@ export default function PlaylistPicker() {
         <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
           <path d="M3 10h11v2H3v-2zm0-4h11v2H3V6zm0 8h7v2H3v-2zm13-1v8l7-4-7-4z" />
         </svg>
-        <span>Playlist</span>
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: "2px" }}>
+        <span className="nav-label">Playlist</span>
+        <svg className="nav-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: "2px" }}>
           <line x1="7" y1="17" x2="17" y2="7"></line>
           <polyline points="7 7 17 7 17 17"></polyline>
         </svg>
       </button>
 
-      {open && (
-        <>
-          <div className="playlist-backdrop" onClick={() => setOpen(false)} />
-          <div className="playlist-popover" role="dialog" aria-label="Playlist">
-            <div className="playlist-popover-title">Playlists</div>
-
-            {customPlaylist && (
-              <div className="playlist-current">
-                <span className="playlist-current-name" title={customPlaylist.name}>
-                  {customPlaylist.name}
-                </span>
-                <button
-                  type="button"
-                  className="playlist-btn playlist-btn-ghost"
-                  onClick={() => {
-                    clearCustomPlaylist();
-                    setOpen(false);
-                  }}
-                >
-                  Default
-                </button>
-              </div>
-            )}
-
-            <div className="preset-list">
-              {PRESET_PLAYLISTS.map((preset) => (
-                <button
-                  key={preset.id}
-                  type="button"
-                  className={`preset-item${customPlaylist?.id === preset.id ? " active" : ""}`}
-                  onClick={() => loadPreset(preset)}
-                >
-                  <span className="preset-hindi">{preset.hindiName}</span>
-                  <span className="preset-sub">
-                    {preset.name} · {preset.tracks.length} songs
-                  </span>
-                  <span className="preset-desc">{preset.description}</span>
-                </button>
-              ))}
-            </div>
-
-            <div className="playlist-divider" />
-
-            <form className="playlist-form" onSubmit={handleSubmit}>
-              <input
-                className="playlist-input"
-                type="text"
-                value={value}
-                onChange={(event) => setValue(event.target.value)}
-                placeholder="YouTube playlist link"
-                maxLength={300}
-              />
-              <button
-                className="playlist-btn"
-                type="submit"
-                disabled={loading || !value.trim()}
-              >
-                {loading ? "…" : "Load"}
-              </button>
-            </form>
-
-            {error && <div className="playlist-error">{error}</div>}
-          </div>
-        </>
-      )}
+      {popoverContent}
     </div>
   );
 }

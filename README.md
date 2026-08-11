@@ -1,11 +1,12 @@
-# डीलक्स सैलून — Dhaba Music Player
+# डीलक्स ढाबा — Dhaba Music Player
 
 A retro Bollywood-style fullscreen music screen for the salon. Plays a YouTube
 playlist through a hidden IFrame API player with a custom glassmorphism UI.
 
 ## Features
 
-- Fullscreen retro dhaba aesthetic (`Yatra One` display font, layered text shadows)
+- Fullscreen retro dhaba aesthetic (`Yatra One` display font, layered text shadows),
+  fully responsive down to phones and landscape mobile
 - Hidden single-video YouTube player; 65-track static playlist with automatic
   next-track on end (`loadVideoById` + `ENDED` event, intros skipped via `start: 5`)
 - Track title/artist/album from a bundled tracklist — no dependence on player metadata
