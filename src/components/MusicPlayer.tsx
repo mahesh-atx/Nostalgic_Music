@@ -7,6 +7,12 @@ import { TRACKS } from "@/lib/tracks";
 import type { Track } from "@/lib/tracks";
 import { getCustomPlaylist, subscribePlaylist } from "@/lib/playlistStore";
 import type { CustomPlaylist } from "@/lib/playlistStore";
+import {
+  consumePendingStart,
+  markPendingStart,
+  registerStartHandler,
+  reportPlaybackState,
+} from "@/lib/playerControl";
 import { YT_MUSIC_PLAYLIST_URL } from "@/lib/links";
 import type { YTPlayer, YTPlayerEvent } from "@/types/youtube";
 
@@ -84,9 +90,16 @@ export default function MusicPlayer() {
   const trackIndexRef = useRef(0);
   const pendingPlayTimerRef = useRef<number | null>(null);
   const lastPlaylistRef = useRef<CustomPlaylist | null>(customPlaylist);
+  const statusRef = useRef<PlayerStatus>("loading");
 
   const track = tracks[trackIndex];
   const progress = duration > 0 ? currentTime / duration : 0;
+
+  // Keep statusRef in sync so the registered start handler always sees the
+  // latest state (avoids stale-closure bugs from the [status] dep).
+  useEffect(() => {
+    statusRef.current = status;
+  }, [status]);
 
   const clearPendingPlay = () => {
     wantPlayRef.current = false;
@@ -148,9 +161,17 @@ export default function MusicPlayer() {
     }, 2500);
   };
 
-  const onPlayerReady = () => {
+  const onPlayerReady = (event?: YTPlayerEvent) => {
     setStatus("ready");
     timerRef.current = window.setInterval(updateFromPlayer, PROGRESS_POLL_MS);
+    // If the overlay (or any pending intent) asked us to start, kick it off
+    // now that the player is alive.
+    if (consumePendingStart()) {
+      const player = event?.target ?? playerRef.current;
+      if (player) {
+        resumePlayback(player);
+      }
+    }
   };
 
   const onPlayerStateChange = (event: YTPlayerEvent) => {
@@ -163,11 +184,14 @@ export default function MusicPlayer() {
         // stay muted rather than losing playback
       }
       setIsPlaying(true);
+      reportPlaybackState(true);
     } else if (event.data === PLAYER_STATES.ENDED) {
       setIsPlaying(false);
+      reportPlaybackState(false);
       goToTrack(trackIndexRef.current + 1);
     } else {
       setIsPlaying(false);
+      reportPlaybackState(false);
     }
   };
 
@@ -309,6 +333,26 @@ export default function MusicPlayer() {
     return subscribePlaylist(() => {
       // useSyncExternalStore already re-renders this component
     });
+  }, []);
+
+  // Expose a "start" hook so the welcome overlay (or any future gesture
+  // capture) can begin playback once a user tap has been registered.
+  useEffect(() => {
+    registerStartHandler(() => {
+      const player = playerRef.current;
+      if (player && statusRef.current === "ready") {
+        resumePlayback(player);
+      } else {
+        // Player isn't ready yet — flag pending so onPlayerReady picks it up.
+        // Use markPendingStart (not requestStart) to avoid a recursive loop
+        // through this same handler.
+        markPendingStart();
+      }
+    });
+    return () => registerStartHandler(null);
+    // resumePlayback is a stable, in-component function that uses refs; we
+    // intentionally mount this handler only once.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleRetry = () => {

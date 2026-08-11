@@ -4,6 +4,7 @@ import Clock from "@/components/Clock";
 import MusicPlayer from "@/components/MusicPlayer";
 import OnlineCounter from "@/components/OnlineCounter";
 import PlaylistPicker from "@/components/PlaylistPicker";
+import WelcomeOverlay from "@/components/WelcomeOverlay";
 import { SPOTIFY_PLAYLIST_URL, YT_MUSIC_PLAYLIST_URL } from "@/lib/links";
 
 export default function Home() {
@@ -51,6 +52,10 @@ export default function Home() {
       </div>
 
       <MusicPlayer />
+
+      {/* Splash that captures a user gesture to start background playback.
+          Hides itself on subsequent visits (localStorage). */}
+      <WelcomeOverlay />
     </div>
   );
 }

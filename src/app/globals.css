@@ -858,3 +858,187 @@ html {
     display: none;
   }
 }
+
+/* ========================================
+   Welcome overlay — captures the first user
+   gesture required to start audio playback
+   on iOS Safari and other mobile browsers.
+   ======================================== */
+
+@keyframes welcome-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes welcome-fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.welcome-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(8, 5, 3, 0.86);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: welcome-fade-in 0.5s ease forwards;
+}
+
+.welcome-overlay.fading {
+  animation: welcome-fade-out 0.7s ease forwards;
+  pointer-events: none;
+}
+
+.welcome-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 32px 40px;
+  max-width: 520px;
+  width: calc(100% - 48px);
+}
+
+.welcome-hindi {
+  font-family: "Yatra One", cursive;
+  font-size: clamp(72px, 14vw, 140px);
+  line-height: 0.95;
+  color: white;
+  text-shadow:
+    3px 3px 0px rgba(0, 0, 0, 0.8),
+    6px 6px 0px rgba(0, 0, 0, 0.7),
+    10px 10px 0px rgba(0, 0, 0, 0.6),
+    15px 15px 25px rgba(0, 0, 0, 0.5);
+}
+
+.welcome-hindi-sub {
+  margin-top: 4px;
+  color: #eab65f;
+  text-shadow:
+    3px 3px 0px rgba(0, 0, 0, 0.8),
+    6px 6px 0px rgba(0, 0, 0, 0.6),
+    10px 10px 20px rgba(0, 0, 0, 0.5);
+}
+
+.welcome-tagline {
+  margin-top: 18px;
+  font-size: 13px;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.65);
+  font-weight: 500;
+}
+
+.welcome-play {
+  margin-top: 36px;
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  border: none;
+  background: white;
+  color: #1a1310;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow:
+    0 12px 30px rgba(0, 0, 0, 0.4),
+    0 0 0 8px rgba(255, 255, 255, 0.12);
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    background 0.18s ease;
+  /* keep the play icon visually centered */
+  padding-left: 4px;
+}
+
+.welcome-play:hover {
+  transform: scale(1.05);
+  box-shadow:
+    0 16px 40px rgba(0, 0, 0, 0.5),
+    0 0 0 10px rgba(255, 255, 255, 0.18);
+}
+
+.welcome-play:active {
+  transform: scale(0.96);
+  background: #f5e9d0;
+}
+
+.welcome-play:focus-visible {
+  outline: 3px solid #eab65f;
+  outline-offset: 6px;
+}
+
+.welcome-hint {
+  margin-top: 22px;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.75);
+  font-weight: 500;
+  letter-spacing: 0.2px;
+}
+
+/* Mobile: bigger tap target, tighter padding */
+@media (max-width: 768px) {
+  .welcome-card {
+    padding: 24px 20px;
+  }
+
+  .welcome-tagline {
+    font-size: 11px;
+    letter-spacing: 1.4px;
+    margin-top: 12px;
+  }
+
+  .welcome-play {
+    margin-top: 28px;
+    width: 104px;
+    height: 104px;
+    /* Make sure iOS counts it as a touch target without scrim
+       showing through */
+    touch-action: manipulation;
+  }
+
+  .welcome-hint {
+    margin-top: 18px;
+    font-size: 13px;
+  }
+}
+
+/* Short landscape phones */
+@media (max-height: 480px) and (orientation: landscape) {
+  .welcome-card {
+    padding: 8px 24px;
+  }
+
+  .welcome-tagline {
+    margin-top: 4px;
+  }
+
+  .welcome-play {
+    margin-top: 14px;
+    width: 64px;
+    height: 64px;
+  }
+
+  .welcome-play svg {
+    width: 26px;
+    height: 26px;
+  }
+
+  .welcome-hint {
+    margin-top: 8px;
+    font-size: 12px;
+  }
+}
