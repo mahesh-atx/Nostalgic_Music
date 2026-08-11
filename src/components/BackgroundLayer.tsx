@@ -80,11 +80,29 @@ export default function BackgroundLayer() {
   const hasCustom = !!getSavedBackgroundName();
   const showUrl = hasCustom && customUrl ? customUrl : timeBg;
 
+  const [history, setHistory] = useState<string[]>([]);
+
+  useEffect(() => {
+    setHistory((prev) => {
+      if (prev[prev.length - 1] === showUrl) return prev;
+      return [...prev.slice(-1), showUrl];
+    });
+  }, [showUrl]);
+
   return (
-    <div
-      className="time-background"
-      style={{ backgroundImage: `url("${showUrl}")` }}
-      aria-hidden="true"
-    />
+    <>
+      {history.map((url, i) => (
+        <div
+          key={url}
+          className="time-background"
+          style={{
+            backgroundImage: `url("${url}")`,
+            zIndex: i,
+            animation: i > 0 ? "bg-fade-in 1.5s ease-in-out forwards" : "none",
+          }}
+          aria-hidden="true"
+        />
+      ))}
+    </>
   );
 }

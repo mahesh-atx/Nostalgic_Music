@@ -30,19 +30,6 @@ html {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  z-index: 1;
-  transition: background-image 0s;
-}
-
-.time-background::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: inherit;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  animation: bg-fade-in 1.2s ease-out;
 }
 
 @keyframes bg-fade-in {
@@ -524,6 +511,24 @@ html {
   z-index: 1;
 }
 
+.progress-bar-fill::after {
+  content: "";
+  position: absolute;
+  right: -6px;
+  top: 50%;
+  transform: translateY(-50%) scale(0);
+  width: 12px;
+  height: 12px;
+  background: white;
+  border-radius: 50%;
+  transition: transform 0.2s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.progress-bar-bg:hover .progress-bar-fill::after {
+  transform: translateY(-50%) scale(1);
+}
+
 .time-info {
   font-size: 11px;
   color: rgba(255, 255, 255, 0.7);
@@ -757,7 +762,6 @@ html {
   }
 
   .playlist-popover {
-    position: fixed;
     top: auto;
     left: 0;
     right: 0;
