@@ -407,7 +407,7 @@ html {
 /* Music Player */
 .player-container {
   position: absolute;
-  bottom: 40px;
+  bottom: 50px;
   left: 50%;
   transform: translateX(-50%);
   background: linear-gradient(90deg, rgba(140, 75, 60, 0.85) 0%, rgba(180, 80, 60, 0.85) 100%);
@@ -700,7 +700,7 @@ html {
 
   /* ---- Player ---- */
   .player-container {
-    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    bottom: calc(24px + env(safe-area-inset-bottom, 0px));
     width: calc(100% - 24px);
     padding: 8px 16px 8px 8px;
     gap: 12px;
@@ -764,6 +764,8 @@ html {
   }
 
   .playlist-popover {
+    position: fixed;
+    z-index: 9999;
     top: auto;
     left: 0;
     right: 0;
@@ -789,7 +791,7 @@ html {
   }
 
   .player-container {
-    bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
     width: calc(100% - 16px);
     padding: 6px 12px 6px 6px;
     gap: 8px;
