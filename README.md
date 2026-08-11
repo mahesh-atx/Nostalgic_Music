@@ -1,0 +1,66 @@
+# डीलक्स सैलून — Dhaba Music Player
+
+A retro Bollywood-style fullscreen music screen for the salon. Plays a YouTube
+playlist through a hidden IFrame API player with a custom glassmorphism UI.
+
+## Features
+
+- Fullscreen retro dhaba aesthetic (`Yatra One` display font, layered text shadows)
+- Hidden single-video YouTube player; 65-track static playlist with automatic
+  next-track on end (`loadVideoById` + `ENDED` event, intros skipped via `start: 5`)
+- Track title/artist/album from a bundled tracklist — no dependence on player metadata
+- Local cover art (`public/covers/`), spinning album art, clickable seek bar
+- Live IST clock with blinking colon and a real "online" counter (each open
+  tab heartbeats `src/app/api/online/route.ts`; count = active visitors in the
+  last 40s, per-server in-memory)
+- Quick links to the same playlist on Spotify and YouTube Music
+- "+" button in the nav lets anyone swap in their own public YouTube playlist
+  (resolved server-side by `src/app/api/playlist/route.ts`; stored in the browser)
+  or pick one of the four developer rotations from
+  [deluxesaloon.space/playlists](https://www.deluxesaloon.space/playlists)
+  (curated in `src/lib/presets.ts`)
+- Image button in the nav changes the background to an uploaded photo
+  (stored in IndexedDB, edge-to-edge cover, restore-default one click)
+- Graceful loading / error / retry states if the YouTube API is blocked
+
+## Getting Started
+
+```bash
+npm install
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000).
+
+## Scripts
+
+| Command          | Description            |
+| ---------------- | ---------------------- |
+| `npm run dev`    | Start dev server       |
+| `npm run build`  | Production build       |
+| `npm run start`  | Serve production build |
+| `npm run lint`   | Run ESLint             |
+
+## Configuration
+
+- `src/lib/tracks.ts` — the full tracklist (youtubeId, title, artist, album,
+  cover path). Add/remove/reorder songs here; covers live in `public/covers/<videoId>.jpg`.
+- `src/lib/links.ts` — `YT_PLAYLIST_ID` and the Spotify / YouTube Music mirror URLs.
+- `src/app/api/playlist/route.ts` — server-side resolver for user-submitted
+  playlists (no API key needed; parses YouTube's own page data). Capped at 120
+  songs; private/unlisted playlists fail with a friendly error.
+- `src/lib/playlistStore.ts` — browser-side storage of the custom playlist.
+- `src/lib/presets.ts` — the four curated deluxesaloon.space rotations (60 songs
+  each, with titles/artists/albums and cover art) offered inside the picker.
+- `src/lib/backgroundStore.ts` — IndexedDB storage of the uploaded background image.
+- `public/bg.png` — fullscreen background image.
+- `public/covers/` — per-track album art (YouTube thumbnails), pulled in by
+  tracklist `cover` fields; tracks without art get a gradient placeholder.
+
+## Deploy
+
+The easiest option is [Vercel](https://vercel.com/new):
+
+```bash
+npx vercel
+```

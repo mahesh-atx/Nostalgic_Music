@@ -1,0 +1,600 @@
+@import url("https://fonts.googleapis.com/css2?family=Yatra+One&family=Inter:wght@400;500;600&display=swap");
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body,
+html {
+  width: 100%;
+  height: 100%;
+  font-family: "Inter", sans-serif;
+  overflow: hidden;
+}
+
+.background-wrapper {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  background-image: url("/bg.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  color: white;
+  display: flex;
+  flex-direction: column;
+}
+
+.custom-background {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: 1;
+}
+
+.yt-player-host {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 128px;
+  height: 72px;
+  opacity: 0;
+  pointer-events: none;
+  z-index: -1;
+  overflow: hidden;
+}
+
+/* Top Navigation */
+.top-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 26px 32px;
+  font-size: 14px;
+  font-weight: 500;
+  background: transparent;
+  z-index: 10;
+  width: 100%;
+  font-family: system-ui;
+}
+
+.time {
+  opacity: 0.9;
+  letter-spacing: 0.2px;
+}
+
+.clock-period {
+  margin-left: 6px;
+  opacity: 0.7;
+}
+
+.clock-colon {
+  animation: clock-blink 1s step-end infinite;
+}
+
+@keyframes clock-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+.online-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0.9;
+}
+
+.online-label {
+  opacity: 0.7;
+}
+
+.dot-pulse {
+  position: relative;
+  display: inline-flex;
+}
+
+.dot-ping {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background-color: #10b981;
+  animation: dot-ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+@keyframes dot-ping {
+  75%,
+  100% {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  background-color: #10b981; /* Green dot */
+  border-radius: 50%;
+  box-shadow: 0 0 8px #10b981;
+}
+
+.apps {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+}
+
+.app-link {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  opacity: 0.9;
+  font-weight: 600;
+  transition: opacity 0.2s;
+  text-decoration: none;
+  color: inherit;
+}
+
+.app-link:hover {
+  opacity: 1;
+}
+
+.playlist-picker-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.playlist-picker-btn {
+  background: transparent;
+  border: none;
+  padding: 0;
+  font-family: inherit;
+}
+
+.playlist-picker-btn:hover {
+  opacity: 1;
+}
+
+.playlist-picker-btn.active {
+  color: #10b981;
+}
+
+.playlist-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+}
+
+.playlist-popover {
+  position: absolute;
+  top: calc(100% + 14px);
+  right: -8px;
+  z-index: 60;
+  width: 320px;
+  padding: 14px;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: linear-gradient(
+    165deg,
+    rgba(70, 56, 47, 0.88) 0%,
+    rgba(19, 15, 13, 0.97) 70%
+  );
+  backdrop-filter: blur(30px) saturate(150%);
+  -webkit-backdrop-filter: blur(30px) saturate(150%);
+  box-shadow:
+    0 24px 64px rgba(0, 0, 0, 0.6),
+    0 6px 20px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-family: system-ui;
+  text-align: left;
+}
+
+.playlist-popover-title {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  opacity: 0.5;
+}
+
+.playlist-current {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 12px;
+  opacity: 0.85;
+}
+
+.playlist-current-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.preset-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.preset-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  text-align: left;
+  border: 1px solid transparent;
+  background: transparent;
+  border-radius: 12px;
+  padding: 10px 12px;
+  cursor: pointer;
+  color: inherit;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
+  font-family: inherit;
+}
+
+.preset-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.preset-item.active {
+  border-color: rgba(16, 185, 129, 0.45);
+  background: rgba(16, 185, 129, 0.1);
+}
+
+.preset-hindi {
+  font-family: "Yatra One", cursive;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+.preset-sub {
+  font-size: 11px;
+  opacity: 0.55;
+}
+
+.preset-desc {
+  font-size: 11px;
+  line-height: 1.4;
+  opacity: 0.6;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.playlist-divider {
+  height: 1px;
+  margin: 2px 0;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.playlist-form {
+  display: flex;
+  gap: 8px;
+}
+
+.playlist-input {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.08);
+  color: inherit;
+  font-size: 13px;
+  outline: none;
+  transition:
+    border-color 0.15s,
+    background 0.15s;
+}
+
+.playlist-input::placeholder {
+  color: rgba(255, 255, 255, 0.38);
+}
+
+.playlist-input:focus {
+  border-color: rgba(234, 182, 95, 0.55);
+  background: rgba(255, 255, 255, 0.11);
+}
+
+.playlist-btn {
+  padding: 8px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  transition:
+    background 0.15s,
+    border-color 0.15s;
+}
+
+.playlist-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.playlist-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.playlist-btn-ghost {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: inherit;
+  font-weight: 500;
+  padding: 4px 10px;
+  font-size: 12px;
+  box-shadow: none;
+  transition: background 0.15s;
+}
+
+.playlist-btn-ghost:hover:not(:disabled) {
+  filter: none;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.playlist-btn-full {
+  display: block;
+  text-align: center;
+  cursor: pointer;
+}
+
+.playlist-error {
+  font-size: 12px;
+  color: #fca5a5;
+}
+
+.main-title-container {
+  position: absolute;
+  top: 35%;
+  left: 30%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  z-index: 10;
+}
+
+.main-title {
+  font-family: "Yatra One", cursive;
+  font-size: clamp(70px, 11vw, 145px);
+  line-height: 1.05;
+  color: white;
+  text-shadow:
+    3px 3px 0px rgba(0, 0, 0, 0.8),
+    6px 6px 0px rgba(0, 0, 0, 0.7),
+    10px 10px 0px rgba(0, 0, 0, 0.6),
+    15px 15px 25px rgba(0, 0, 0, 0.5);
+}
+
+/* Music Player */
+.player-container {
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(90deg, rgba(140, 75, 60, 0.85) 0%, rgba(180, 80, 60, 0.85) 100%);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 60px;
+  display: flex;
+  align-items: center;
+  padding: 10px 30px 10px 10px;
+  width: 90%;
+  max-width: 600px;
+  gap: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  z-index: 10;
+}
+
+.album-art {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 6px solid rgba(70, 60, 60, 0.5);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+  flex-shrink: 0;
+  animation: album-spin 12s linear infinite;
+  animation-play-state: paused;
+}
+
+.album-art.playing {
+  animation-play-state: running;
+}
+
+.album-art-fallback {
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, #f43f5e, #dc2626, #f59e0b);
+}
+
+@keyframes album-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.track-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+}
+
+.track-title {
+  font-size: 16px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 4px;
+}
+
+.track-artist {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 12px;
+}
+
+.progress-container {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.progress-bar-bg {
+  width: 100%;
+  height: 12px;
+  background: transparent;
+  border-radius: 2px;
+  position: relative;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.progress-bar-bg::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 4px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.progress-bar-fill {
+  position: relative;
+  height: 4px;
+
+  width: 5%;
+  background: white;
+  border-radius: 4px;
+  z-index: 1;
+}
+
+.time-info {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.7);
+  font-variant-numeric: tabular-nums;
+  margin-top: 2px;
+}
+
+.player-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.75);
+  font-variant-numeric: tabular-nums;
+  min-height: 16px;
+}
+
+.player-status-error {
+  color: #fca5a5;
+}
+
+.retry-btn {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 999px;
+  padding: 2px 10px;
+  font-size: 11px;
+  color: white;
+  cursor: pointer;
+  text-decoration: none;
+  transition:
+    background 0.2s,
+    opacity 0.2s;
+}
+
+.retry-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-left: 12px;
+}
+
+.control-btn {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.7;
+  transition:
+    opacity 0.2s,
+    transform 0.2s;
+}
+
+.control-btn:disabled {
+  opacity: 0.3;
+  cursor: default;
+  transform: none;
+}
+
+.control-btn:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+.control-btn:disabled:hover {
+  opacity: 0.3;
+  transform: none;
+}
+
+.play-btn {
+  width: 52px;
+  height: 52px;
+  background: white;
+  color: black;
+  border-radius: 50%;
+  opacity: 1;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.play-btn svg {
+  width: 24px;
+  height: 24px;
+  margin-left: 2px;
+}
+
+.play-btn:hover {
+  transform: scale(1.05);
+}
