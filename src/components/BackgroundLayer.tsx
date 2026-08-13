@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 
-export type Venue = "dhaba" | "saloon" | "farmers" | "tapri";
+export type Venue = "dhaba" | "saloon" | "farmers" | "tapri" | "era2010";
 
 const PARALLAX_MAX_SHIFT = 9; // px the background can drift
 const PARALLAX_SCALE = 1.06; // extra zoom so the edges never show
@@ -11,13 +11,6 @@ const PARALLAX_LERP = 0.08; // smoothing factor
 const clamp = (value: number, min: number, max: number) =>
   Math.min(max, Math.max(min, value));
 
-/**
- * Maps the current hour (Asia/Kolkata) to the appropriate dhaba background.
- *
- *   Morning  06:00 – 16:59  →  /bg-marning.webp
- *   Sunset   17:00 – 19:59  →  /bg-sunset.webp
- *   Night    20:00 – 05:59  →  /bg-night.webp
- */
 function getTimeBasedBackground(): string {
   const now = new Date();
   const istHour = Number(
@@ -136,7 +129,7 @@ export default function BackgroundLayer({ venue }: { venue: Venue }) {
           layersRef.current[2] = node;
         }}
         className={`time-background venue-background farmers-background${venue === "farmers" ? " active" : ""}`}
-        style={{ backgroundImage: 'url("/farmer.webp")' }}
+        style={{ backgroundImage: 'url("/farmer.png")' }}
         aria-hidden="true"
       />
       <div
@@ -144,7 +137,15 @@ export default function BackgroundLayer({ venue }: { venue: Venue }) {
           layersRef.current[3] = node;
         }}
         className={`time-background venue-background tapri-background${venue === "tapri" ? " active" : ""}`}
-        style={{ backgroundImage: 'url("/tapri.webp")' }}
+        style={{ backgroundImage: 'url("/chai-bg.png")' }}
+        aria-hidden="true"
+      />
+      <div
+        ref={(node) => {
+          layersRef.current[4] = node;
+        }}
+        className={`time-background venue-background era2010-background${venue === "era2010" ? " active" : ""}`}
+        style={{ backgroundImage: 'url("/2009-10era.png")' }}
         aria-hidden="true"
       />
     </>
