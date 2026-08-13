@@ -1,12 +1,13 @@
-# डीलक्स ढाबा — Dhaba Music Player
+# डीलक्स ढाबा × सैलून — Music Player
 
-A retro Bollywood-style fullscreen music screen for the salon. Plays a YouTube
-playlist through a hidden IFrame API player with a custom glassmorphism UI.
+A retro Bollywood-style fullscreen music screen with switchable Dhaba and Saloon
+scenes. Plays a YouTube playlist through a hidden IFrame API player with a custom
+glassmorphism UI.
 
 ## Features
 
-- Fullscreen retro dhaba aesthetic (`Yatra One` display font, layered text shadows),
-  fully responsive down to phones and landscape mobile
+- Switch between the time-aware Dhaba and Delux Saloon scenes without interrupting
+  playback; fully responsive down to phones and landscape mobile
 - Hidden single-video YouTube player; 65-track static playlist with automatic
   next-track on end (`loadVideoById` + `ENDED` event, intros skipped via `start: 5`)
 - Track title/artist/album from a bundled tracklist — no dependence on player metadata
@@ -20,8 +21,7 @@ playlist through a hidden IFrame API player with a custom glassmorphism UI.
   or pick one of the four developer rotations from
   [deluxesaloon.space/playlists](https://www.deluxesaloon.space/playlists)
   (curated in `src/lib/presets.ts`)
-- Image button in the nav changes the background to an uploaded photo
-  (stored in IndexedDB, edge-to-edge cover, restore-default one click)
+- Automatic morning, sunset, and night backgrounds based on the current IST hour
 - Graceful loading / error / retry states if the YouTube API is blocked
 
 ## Getting Started
@@ -53,8 +53,9 @@ Open [http://localhost:3000](http://localhost:3000).
 - `src/lib/playlistStore.ts` — browser-side storage of the custom playlist.
 - `src/lib/presets.ts` — the four curated deluxesaloon.space rotations (60 songs
   each, with titles/artists/albums and cover art) offered inside the picker.
-- `src/lib/backgroundStore.ts` — IndexedDB storage of the uploaded background image.
-- `public/bg.png` — fullscreen background image.
+- `public/bg-marning.png`, `public/bg-sunset.png`, and `public/bg-night.png` —
+  fullscreen Dhaba backgrounds selected automatically from the current IST hour.
+- `public/delux-saloon.png` — fullscreen Delux Saloon artwork.
 - `public/covers/` — per-track album art (YouTube thumbnails), pulled in by
   tracklist `cover` fields; tracks without art get a gradient placeholder.
 

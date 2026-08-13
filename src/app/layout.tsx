@@ -16,9 +16,9 @@ const yatraOne = Yatra_One({
 });
 
 export const metadata: Metadata = {
-  title: "डीलक्स ढाबा — Dhaba Music Player",
+  title: "डीलक्स ढाबा × सैलून — Music Player",
   description:
-    "डीलक्स ढाबा — a retro Bollywood music player that runs fullscreen in the shop. 90s punjabi tunes on tap, straight from the dhaba playlist, with a live IST clock and cover art for every song.",
+    "Switch between डीलक्स ढाबा and डीलक्स सैलून while Bollywood classics play around the clock, with a live IST clock and cover art for every song.",
 };
 
 export default function RootLayout({

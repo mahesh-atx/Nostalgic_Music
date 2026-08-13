@@ -88,7 +88,18 @@ input:focus-visible,
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
+  opacity: 0;
   transform: scale(1.002);
+  transition: opacity 650ms var(--ease-out);
+  will-change: opacity;
+}
+
+.venue-background.active {
+  opacity: 1;
+}
+
+.saloon-background {
+  background-position: center 48%;
 }
 
 @keyframes bg-fade-in {
@@ -106,6 +117,79 @@ input:focus-visible,
   overflow: hidden;
   opacity: 0;
   pointer-events: none;
+}
+
+/* Venue switch */
+.venue-switch {
+  position: absolute;
+  bottom: 154px;
+  left: 50%;
+  z-index: 24;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 4px;
+  transform: translateX(-50%);
+  border: 1px solid rgba(255, 246, 231, 0.16);
+  border-radius: 15px;
+  color: var(--ivory);
+  background: linear-gradient(120deg, rgba(34, 27, 23, 0.82), rgba(11, 10, 9, 0.76));
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.34), inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(20px) saturate(135%);
+  -webkit-backdrop-filter: blur(20px) saturate(135%);
+}
+
+.venue-switch-label {
+  padding: 0 8px 0 9px;
+  color: rgba(255, 246, 231, 0.44);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.venue-option {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 88px;
+  min-height: 34px;
+  padding: 0 11px;
+  border: 0;
+  border-radius: 10px;
+  color: rgba(255, 246, 231, 0.62);
+  background: transparent;
+  cursor: pointer;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  transition: color 180ms ease, background 180ms ease, box-shadow 180ms ease, transform 180ms var(--ease-out);
+}
+
+.venue-option:hover:not(.active) {
+  color: var(--ivory);
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.venue-option:active {
+  transform: scale(0.97);
+}
+
+.venue-option.active {
+  color: #2b1c10;
+  background: linear-gradient(135deg, var(--amber-bright), var(--ivory));
+  box-shadow: 0 5px 14px rgba(0, 0, 0, 0.3), inset 0 1px 0 white;
+}
+
+.venue-option svg {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 /* Header */
@@ -428,10 +512,6 @@ input:focus-visible,
 
 .playlist-btn-ghost:hover:not(:disabled) { background: rgba(255, 255, 255, 0.1); }
 
-.playlist-btn-full {
-  display: block;
-  text-align: center;
-}
 
 .playlist-error {
   color: #ffb4ab;
@@ -456,8 +536,23 @@ input:focus-visible,
   align-items: center;
   width: min(560px, 48vw);
   transform: translate(-50%, -50%);
+  animation: brand-enter 450ms var(--ease-out) both;
   text-align: center;
   filter: drop-shadow(0 24px 42px rgba(12, 6, 3, 0.42));
+}
+
+.hero-saloon .main-title-container {
+  top: 35%;
+  left: 27%;
+}
+
+.hero-saloon .brand-kicker {
+  color: #ffcb9a;
+}
+
+@keyframes brand-enter {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .brand-kicker {
@@ -802,7 +897,10 @@ input:focus-visible,
 
   .apps { gap: 2px; }
 
-  .main-title-container {
+  .venue-switch-label { display: none; }
+
+  .main-title-container,
+  .hero-saloon .main-title-container {
     top: 34%;
     left: 50%;
     width: 90vw;
@@ -830,10 +928,22 @@ input:focus-visible,
   .clock-period { font-size: 8px; }
   .online-label { display: none; }
   .online-status { gap: 5px; font-size: 10px; }
-  .bg-picker-wrap { display: none; }
 
   .brand-kicker { margin-bottom: 7px; }
   .brand-subtitle { margin-top: 14px; }
+
+  .venue-switch {
+    bottom: calc(108px + env(safe-area-inset-bottom, 0px));
+    padding: 3px;
+    border-radius: 13px;
+  }
+
+  .venue-option {
+    min-width: 78px;
+    min-height: 32px;
+    padding: 0 9px;
+    font-size: 9px;
+  }
 
   .player-container {
     bottom: calc(14px + env(safe-area-inset-bottom, 0px));
@@ -896,6 +1006,7 @@ input:focus-visible,
   }
 
   .app-link { width: 36px; min-height: 36px; }
+  .venue-option { min-width: 70px; }
   .main-title { font-size: clamp(62px, 20vw, 82px); }
   .brand-caption { display: none; }
 
@@ -920,11 +1031,14 @@ input:focus-visible,
     padding-bottom: 3px;
   }
 
-  .main-title-container {
+  .main-title-container,
+  .hero-saloon .main-title-container {
     top: 38%;
     left: 29%;
     width: 45vw;
   }
+
+  .venue-switch { bottom: 88px; }
 
   .main-title { font-size: clamp(54px, 12vh, 78px); }
   .brand-kicker,
