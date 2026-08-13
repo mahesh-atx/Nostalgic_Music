@@ -7,6 +7,12 @@ import { TRACKS } from "@/lib/tracks";
 import type { Track } from "@/lib/tracks";
 import { getCustomPlaylist, subscribePlaylist } from "@/lib/playlistStore";
 import type { CustomPlaylist } from "@/lib/playlistStore";
+import {
+  clearPendingJump,
+  getPendingJump,
+  setTrackIndex,
+  subscribePlayer,
+} from "@/lib/playerStore";
 import { YT_MUSIC_PLAYLIST_URL } from "@/lib/links";
 import type { YTPlayer, YTPlayerEvent } from "@/types/youtube";
 
@@ -59,6 +65,47 @@ function TrackArt({
       onError={() => setFailed(true)}
       priority
     />
+  );
+}
+
+/**
+ * Eagerly loads only the covers for the tracks immediately before and after
+ * the current one, so skipping tracks never flashes a blank square — without
+ * pulling in the whole 60+ track library up front.
+ */
+function AdjacentCoverPreload({
+  tracks,
+  index,
+}: {
+  tracks: Track[];
+  index: number;
+}) {
+  if (tracks.length < 2) return null;
+
+  const count = tracks.length;
+  const adjacentIndexes = [...new Set(
+    [index + 1, index - 1]
+      .map((i) => ((i % count) + count) % count)
+      .filter((i) => i !== index)
+  )];
+
+  return (
+    <div className="cover-preload" aria-hidden="true">
+      {adjacentIndexes.map((i) => {
+        const cover = tracks[i]?.cover;
+        return cover ? (
+          <Image
+            key={tracks[i].youtubeId}
+            src={cover}
+            alt=""
+            width={84}
+            height={84}
+            loading="eager"
+            decoding="async"
+          />
+        ) : null;
+      })}
+    </div>
   );
 }
 
@@ -117,6 +164,7 @@ export default function MusicPlayer() {
     const nextIndex = ((index % tracks.length) + tracks.length) % tracks.length;
     trackIndexRef.current = nextIndex;
     setTrackIndexState(nextIndex);
+    setTrackIndex(nextIndex);
     setCurrentTime(0);
     setDuration(0);
     try {
@@ -213,6 +261,7 @@ export default function MusicPlayer() {
     setDuration(0);
     trackIndexRef.current = 0;
     setTrackIndexState(0);
+    setTrackIndex(0);
     try {
       playerRef.current?.destroy();
     } catch {
@@ -311,6 +360,23 @@ export default function MusicPlayer() {
     });
   }, []);
 
+  // Keep a ref to the latest goToTrack so the jump-request subscription below
+  // never calls a stale closure over the current track list.
+  const goToTrackRef = useRef(goToTrack);
+  useEffect(() => {
+    goToTrackRef.current = goToTrack;
+  });
+
+  // Consume "jump to track" requests coming from the queue in PlaylistPicker.
+  useEffect(() => {
+    return subscribePlayer(() => {
+      const jump = getPendingJump();
+      if (jump === null) return;
+      clearPendingJump();
+      goToTrackRef.current(jump);
+    });
+  }, []);
+
   const handleRetry = () => {
     setStatus("loading");
     setErrorMessage("");
@@ -374,6 +440,8 @@ export default function MusicPlayer() {
       <div className="yt-player-host">
         <div id="yt-player" />
       </div>
+
+      <AdjacentCoverPreload tracks={tracks} index={trackIndex} />
 
       <div className="player-container">
         <TrackArt key={track.youtubeId} track={track} isPlaying={isPlaying} />

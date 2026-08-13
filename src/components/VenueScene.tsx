@@ -17,6 +17,24 @@ const VENUE_COPY = {
     subtitle: "पुराने नग़मे, नई कटिंग",
     caption: "Classic cuts · timeless tunes",
   },
+  farmers: {
+    kicker: "संगीत और खेती",
+    title: ["डीलक्स", "किसान"],
+    subtitle: "पुराने नग़मे, हरे खेत",
+    caption: "Farming classics · always on",
+  },
+  tapri: {
+    kicker: "संगीत और कड़क चाय",
+    title: ["डीलक्स", "टपरी"],
+    subtitle: "पुराने नग़मे, कड़क चाय",
+    caption: "Chai tapri · always on",
+  },
+  era2010: {
+    kicker: "संगीत और 2010",
+    title: ["डीलक्स", "2010"],
+    subtitle: "पुराने नग़मे, 2010 का दौर",
+    caption: "2010 era · always on",
+  },
 } as const;
 
 export default function VenueScene() {
@@ -52,6 +70,46 @@ export default function VenueScene() {
             <path d="m8.7 8.4 10.8 6.1M8.7 15.6 19.5 9.5M12 12l7.5-4" />
           </svg>
           <span>Saloon</span>
+        </button>
+        <button
+          className={`venue-option${venue === "farmers" ? " active" : ""}`}
+          type="button"
+          aria-pressed={venue === "farmers"}
+          onClick={() => setVenue("farmers")}
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 22v-9" />
+            <path d="M12 13c0-3.4 2.2-5.6 5.4-5.6 0 3.4-2.2 5.6-5.4 5.6Z" />
+            <path d="M12 13c0-3.4-2.2-5.6-5.4-5.6 0 3.4 2.2 5.6 5.4 5.6Z" />
+          </svg>
+          <span>Farmers</span>
+        </button>
+        <button
+          className={`venue-option${venue === "tapri" ? " active" : ""}`}
+          type="button"
+          aria-pressed={venue === "tapri"}
+          onClick={() => setVenue("tapri")}
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M5 8h13v6a5 5 0 0 1-5 5h-3a5 5 0 0 1-5-5V8Z" />
+            <path d="M18 10h2a2 2 0 0 1 0 4h-2" />
+            <path d="M8.5 5c0-1.2.7-2 1.5-2s1.5.8 1.5 2" />
+            <path d="M12.5 5c0-1.2.7-2 1.5-2s1.5.8 1.5 2" />
+          </svg>
+          <span>Tapri</span>
+        </button>
+        <button
+          className={`venue-option${venue === "era2010" ? " active" : ""}`}
+          type="button"
+          aria-pressed={venue === "era2010"}
+          onClick={() => setVenue("era2010")}
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+            <circle cx="8.5" cy="8.5" r="1.5" />
+            <polyline points="21 15 16 10 5 21" />
+          </svg>
+          <span>2010</span>
         </button>
       </div>
 
