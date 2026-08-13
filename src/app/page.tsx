@@ -11,12 +11,12 @@ export default function Home() {
     <div className="background-wrapper">
       <BackgroundLayer />
 
-      <nav className="top-nav">
+      <header className="top-nav">
         <Clock />
 
         <OnlineCounter />
 
-        <div className="apps">
+        <nav className="apps" aria-label="Music and display options">
           <BackgroundPicker />
 
           <a className="app-link" href={SPOTIFY_PLAYLIST_URL} target="_blank" rel="noopener noreferrer">
@@ -42,13 +42,23 @@ export default function Home() {
           </a>
 
           <PlaylistPicker />
-        </div>
-      </nav>
+        </nav>
+      </header>
 
-      <div className="main-title-container">
-        <div className="main-title">डीलक्स</div>
-        <div className="main-title">ढाबा</div>
-      </div>
+      <main className="hero">
+        <div className="main-title-container">
+          <p className="brand-kicker">
+            <span className="brand-kicker-line" aria-hidden="true" />
+            चौबीसों घंटे संगीत
+          </p>
+          <h1 className="main-title">
+            <span>डीलक्स</span>
+            <span>ढाबा</span>
+          </h1>
+          <p className="brand-subtitle">पुराने नग़मे, गरम चाय</p>
+          <p className="brand-caption">Bollywood classics · always on</p>
+        </div>
+      </main>
 
       <MusicPlayer />
     </div>

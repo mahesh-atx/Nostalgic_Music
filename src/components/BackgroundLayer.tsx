@@ -83,6 +83,8 @@ export default function BackgroundLayer() {
   const [history, setHistory] = useState<string[]>([]);
 
   useEffect(() => {
+    // The previous URL is retained briefly so CSS can cross-fade between scenes.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setHistory((prev) => {
       if (prev[prev.length - 1] === showUrl) return prev;
       return [...prev.slice(-1), showUrl];

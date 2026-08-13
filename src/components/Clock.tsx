@@ -16,21 +16,24 @@ function formatParts(date: Date) {
 }
 
 export default function Clock() {
-  const [mounted, setMounted] = useState(false);
-  const [time, setTime] = useState(() => formatParts(new Date()));
+  const [time, setTime] = useState<ReturnType<typeof formatParts> | null>(null);
 
   useEffect(() => {
-    setMounted(true);
-    const id = setInterval(() => setTime(formatParts(new Date())), 1000);
-    return () => clearInterval(id);
+    const update = () => setTime(formatParts(new Date()));
+    const initialId = window.setTimeout(update, 0);
+    const intervalId = window.setInterval(update, 1000);
+    return () => {
+      window.clearTimeout(initialId);
+      window.clearInterval(intervalId);
+    };
   }, []);
 
   return (
     <div className="time" suppressHydrationWarning>
-      {mounted ? time.hour : ""}
-      <span className="clock-colon">{mounted ? ":" : ""}</span>
-      {mounted ? time.minute : ""}
-      <span className="clock-period">{mounted ? time.period : ""}</span>
+      {time?.hour ?? ""}
+      <span className="clock-colon">{time ? ":" : ""}</span>
+      {time?.minute ?? ""}
+      <span className="clock-period">{time?.period ?? ""}</span>
     </div>
   );
 }

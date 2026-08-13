@@ -1,5 +1,19 @@
 import type { Metadata } from "next";
+import { Inter, Yatra_One } from "next/font/google";
 import "./globals.css";
+
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
+});
+
+const yatraOne = Yatra_One({
+  weight: "400",
+  subsets: ["devanagari", "latin"],
+  variable: "--font-yatra",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "डीलक्स ढाबा — Dhaba Music Player",
@@ -13,7 +27,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="hi">
+    <html lang="hi" className={`${inter.variable} ${yatraOne.variable}`}>
       <body>{children}</body>
     </html>
   );

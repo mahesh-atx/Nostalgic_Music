@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
-import type { MouseEvent } from "react";
+import type { KeyboardEvent, MouseEvent } from "react";
 import { TRACKS } from "@/lib/tracks";
 import type { Track } from "@/lib/tracks";
 import { getCustomPlaylist, subscribePlaylist } from "@/lib/playlistStore";
@@ -53,8 +53,8 @@ function TrackArt({
     <Image
       src={track.cover}
       alt={`${track.title} artwork`}
-      width={60}
-      height={60}
+      width={84}
+      height={84}
       className={`album-art${spinningClass}`}
       onError={() => setFailed(true)}
       priority
@@ -343,17 +343,30 @@ export default function MusicPlayer() {
 
   const prevTrack = () => goToTrack(trackIndexRef.current - 1);
 
-  const handleSeek = (event: MouseEvent<HTMLDivElement>) => {
+  const seekTo = (time: number) => {
     const player = playerRef.current;
     if (!player || duration <= 0) return;
-    const rect = event.currentTarget.getBoundingClientRect();
-    const fraction = Math.min(1, Math.max(0, (event.clientX - rect.left) / rect.width));
+    const nextTime = Math.min(duration, Math.max(0, time));
     try {
-      player.seekTo(fraction * duration, true);
-      setCurrentTime(fraction * duration);
+      player.seekTo(nextTime, true);
+      setCurrentTime(nextTime);
     } catch {
       // transient
     }
+  };
+
+  const handleSeek = (event: MouseEvent<HTMLDivElement>) => {
+    const rect = event.currentTarget.getBoundingClientRect();
+    const fraction = Math.min(1, Math.max(0, (event.clientX - rect.left) / rect.width));
+    seekTo(fraction * duration);
+  };
+
+  const handleSeekKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+    event.preventDefault();
+    if (event.key === "Home") seekTo(0);
+    else if (event.key === "End") seekTo(duration);
+    else seekTo(currentTime + (event.key === "ArrowRight" ? 5 : -5));
   };
 
   return (
@@ -366,13 +379,26 @@ export default function MusicPlayer() {
         <TrackArt key={track.youtubeId} track={track} isPlaying={isPlaying} />
 
         <div className="track-info">
+          <div className="track-meta-row">
+            <span className="now-playing">
+              <span className={`now-playing-bars${isPlaying ? " active" : ""}`} aria-hidden="true">
+                <i />
+                <i />
+                <i />
+              </span>
+              {isPlaying ? "Now playing" : "Deluxe radio"}
+            </span>
+            <span className="track-count">
+              {String(trackIndex + 1).padStart(2, "0")} / {String(tracks.length).padStart(2, "0")}
+            </span>
+          </div>
           <div className="track-title">{track.title}</div>
           <div className="track-artist">{track.artist || track.album}</div>
 
           {status === "error" ? (
             <div className="player-status player-status-error">
               <span>{errorMessage}</span>
-              <button className="retry-btn" onClick={handleRetry}>
+              <button className="retry-btn" type="button" onClick={handleRetry}>
                 Retry
               </button>
               <a className="retry-btn" href={YT_MUSIC_PLAYLIST_URL} target="_blank" rel="noopener noreferrer">
@@ -390,24 +416,28 @@ export default function MusicPlayer() {
                 aria-valuemin={0}
                 aria-valuemax={100}
                 aria-valuenow={Math.round(progress * 100)}
+                aria-valuetext={`${formatTime(currentTime)} of ${formatTime(duration)}`}
+                tabIndex={0}
                 onClick={handleSeek}
+                onKeyDown={handleSeekKeyDown}
               >
                 <div className="progress-bar-fill" style={{ width: `${progress * 100}%` }} />
               </div>
               <div className="time-info">
-                {formatTime(currentTime)} / {formatTime(duration)}
+                <span>{formatTime(currentTime)}</span>
+                <span>{formatTime(duration)}</span>
               </div>
             </div>
           )}
         </div>
 
         <div className="controls">
-          <button className="control-btn" aria-label="Previous" onClick={prevTrack} disabled={status !== "ready"}>
+          <button className="control-btn" type="button" aria-label="Previous track" onClick={prevTrack} disabled={status !== "ready"}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
               <path d="M6 6H8V18H6V6ZM9.5 12L18 18V6L9.5 12Z" />
             </svg>
           </button>
-          <button className="control-btn play-btn" aria-label="Play/Pause" onClick={togglePlay} disabled={status !== "ready"}>
+          <button className="control-btn play-btn" type="button" aria-label={isPlaying ? "Pause" : "Play"} onClick={togglePlay} disabled={status !== "ready"}>
             {isPlaying ? (
               <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                 <rect x="6" y="4" width="4" height="16" />
@@ -419,7 +449,7 @@ export default function MusicPlayer() {
               </svg>
             )}
           </button>
-          <button className="control-btn" aria-label="Next" onClick={nextTrack} disabled={status !== "ready"}>
+          <button className="control-btn" type="button" aria-label="Next track" onClick={nextTrack} disabled={status !== "ready"}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
               <path d="M6 18L14.5 12L6 6V18ZM16 6V18H18V6H16Z" />
             </svg>

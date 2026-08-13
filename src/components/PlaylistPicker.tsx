@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState, useSyncExternalStore } from "react";
-import { createPortal } from "react-dom";
 import type { FormEvent } from "react";
 import {
   clearCustomPlaylist,
@@ -29,11 +28,6 @@ export default function PlaylistPicker() {
   const [value, setValue] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   useEffect(() => {
     if (!open) return;
@@ -87,7 +81,7 @@ export default function PlaylistPicker() {
     }
   };
 
-  const popoverContent = open && mounted ? (
+  const popoverContent = open ? (
     <>
       <div className="playlist-backdrop" onClick={() => setOpen(false)} />
       <div className="playlist-popover" role="dialog" aria-label="Playlist">
@@ -167,9 +161,8 @@ export default function PlaylistPicker() {
           <path d="M3 10h11v2H3v-2zm0-4h11v2H3V6zm0 8h7v2H3v-2zm13-1v8l7-4-7-4z" />
         </svg>
         <span className="nav-label">Playlist</span>
-        <svg className="nav-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: "2px" }}>
-          <line x1="7" y1="17" x2="17" y2="7"></line>
-          <polyline points="7 7 17 7 17 17"></polyline>
+        <svg className="nav-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="m7 10 5 5 5-5" />
         </svg>
       </button>
 
