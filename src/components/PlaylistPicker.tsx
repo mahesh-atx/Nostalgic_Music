@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState, useSyncExternalStore } from "react";
-import type { FormEvent } from "react";
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
+import type { CSSProperties, FormEvent } from "react";
+import { createPortal } from "react-dom";
 import {
   clearCustomPlaylist,
   getCustomPlaylist,
@@ -28,15 +29,37 @@ export default function PlaylistPicker() {
   const [value, setValue] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const [anchor, setAnchor] = useState<{ top: number; right: number } | null>(null);
+
+  const updateAnchor = useCallback(() => {
+    const trigger = triggerRef.current;
+    if (!trigger) return;
+    const rect = trigger.getBoundingClientRect();
+    setAnchor({
+      top: rect.bottom + 14,
+      right: Math.max(0, window.innerWidth - rect.right),
+    });
+  }, []);
 
   useEffect(() => {
     if (!open) return;
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") setOpen(false);
     };
+    const onResize = () => updateAnchor();
     window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [open]);
+    window.addEventListener("resize", onResize);
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener("resize", onResize);
+    };
+  }, [open, updateAnchor]);
+
+  const toggleOpen = () => {
+    if (!open) updateAnchor();
+    setOpen((wasOpen) => !wasOpen);
+  };
 
   const loadPreset = (preset: PresetPlaylist) => {
     saveCustomPlaylist({
@@ -81,11 +104,22 @@ export default function PlaylistPicker() {
     }
   };
 
-  const popoverContent = open ? (
-    <>
-      <div className="playlist-backdrop" onClick={() => setOpen(false)} />
-      <div className="playlist-popover" role="dialog" aria-label="Playlist">
-        <div className="playlist-popover-title">Playlists</div>
+  const popoverContent = open
+    ? createPortal(
+        <>
+          <div className="playlist-backdrop" onClick={() => setOpen(false)} />
+          <div
+            className="playlist-popover"
+            role="dialog"
+            aria-label="Playlist"
+            style={
+              anchor
+                ? ({ "--popover-top": `${anchor.top}px`, "--popover-right": `${anchor.right}px` } as CSSProperties)
+                : undefined
+            }
+          >
+            <div className="playlist-sheet-handle" aria-hidden="true" />
+            <div className="playlist-popover-title">Playlists</div>
 
         {customPlaylist && (
           <div className="playlist-current">
@@ -143,19 +177,22 @@ export default function PlaylistPicker() {
         </form>
 
         {error && <div className="playlist-error">{error}</div>}
-      </div>
-    </>
-  ) : null;
+          </div>
+        </>,
+        document.body
+      )
+    : null;
 
   return (
     <div className="playlist-picker-wrap">
       <button
+        ref={triggerRef}
         className={`app-link playlist-picker-btn${customPlaylist ? " active" : ""}`}
         type="button"
         title={customPlaylist ? `Playing: ${customPlaylist.name}` : "Add your playlist"}
         aria-label="Add your playlist"
         aria-expanded={open}
-        onClick={() => setOpen((wasOpen) => !wasOpen)}
+        onClick={toggleOpen}
       >
         <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
           <path d="M3 10h11v2H3v-2zm0-4h11v2H3V6zm0 8h7v2H3v-2zm13-1v8l7-4-7-4z" />

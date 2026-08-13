@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-export type Venue = "dhaba" | "saloon";
+export type Venue = "dhaba" | "saloon" | "farmers";
 
 /**
  * Maps the current hour (Asia/Kolkata) to the appropriate dhaba background.
@@ -52,6 +52,11 @@ export default function BackgroundLayer({ venue }: { venue: Venue }) {
       <div
         className={`time-background venue-background saloon-background${venue === "saloon" ? " active" : ""}`}
         style={{ backgroundImage: 'url("/delux-saloon.png")' }}
+        aria-hidden="true"
+      />
+      <div
+        className={`time-background venue-background farmers-background${venue === "farmers" ? " active" : ""}`}
+        style={{ backgroundImage: 'url("/farmer.png")' }}
         aria-hidden="true"
       />
     </>

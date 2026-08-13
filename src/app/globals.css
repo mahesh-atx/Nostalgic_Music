@@ -337,14 +337,14 @@ input:focus-visible,
 .playlist-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 50;
+  z-index: 10000;
 }
 
 .playlist-popover {
-  position: absolute;
-  top: calc(100% + 14px);
-  right: 0;
-  z-index: 60;
+  position: fixed;
+  top: var(--popover-top, auto);
+  right: var(--popover-right, auto);
+  z-index: 10001;
   display: flex;
   flex-direction: column;
   gap: 11px;
@@ -369,6 +369,10 @@ input:focus-visible,
   font-weight: 700;
   letter-spacing: 0.18em;
   text-transform: uppercase;
+}
+
+.playlist-sheet-handle {
+  display: none;
 }
 
 .playlist-current {
@@ -548,6 +552,10 @@ input:focus-visible,
 
 .hero-saloon .brand-kicker {
   color: #ffcb9a;
+}
+
+.hero-farmers .brand-kicker {
+  color: #bfe3a0;
 }
 
 @keyframes brand-enter {
@@ -979,8 +987,19 @@ input:focus-visible,
   }
 
   .playlist-backdrop {
-    z-index: 9998;
+    z-index: 10000;
     background: rgba(0, 0, 0, 0.52);
+  }
+
+  .playlist-sheet-handle {
+    display: block;
+    align-self: center;
+    flex: none;
+    width: 40px;
+    height: 4px;
+    margin-bottom: 2px;
+    border-radius: 999px;
+    background: rgba(255, 246, 231, 0.24);
   }
 
   .playlist-popover {
@@ -989,12 +1008,12 @@ input:focus-visible,
     right: 0;
     bottom: 0;
     left: 0;
-    z-index: 9999;
+    z-index: 10001;
     width: 100%;
     max-width: 100%;
     max-height: 72vh;
     max-height: 72dvh;
-    padding: 19px 16px calc(16px + env(safe-area-inset-bottom, 0px));
+    padding: 14px 16px calc(16px + env(safe-area-inset-bottom, 0px));
     border-radius: 22px 22px 0 0;
   }
 }
