@@ -7,6 +7,12 @@ import { TRACKS } from "@/lib/tracks";
 import type { Track } from "@/lib/tracks";
 import { getCustomPlaylist, subscribePlaylist } from "@/lib/playlistStore";
 import type { CustomPlaylist } from "@/lib/playlistStore";
+import {
+  clearPendingJump,
+  getPendingJump,
+  setTrackIndex,
+  subscribePlayer,
+} from "@/lib/playerStore";
 import { YT_MUSIC_PLAYLIST_URL } from "@/lib/links";
 import type { YTPlayer, YTPlayerEvent } from "@/types/youtube";
 
@@ -158,6 +164,7 @@ export default function MusicPlayer() {
     const nextIndex = ((index % tracks.length) + tracks.length) % tracks.length;
     trackIndexRef.current = nextIndex;
     setTrackIndexState(nextIndex);
+    setTrackIndex(nextIndex);
     setCurrentTime(0);
     setDuration(0);
     try {
@@ -254,6 +261,7 @@ export default function MusicPlayer() {
     setDuration(0);
     trackIndexRef.current = 0;
     setTrackIndexState(0);
+    setTrackIndex(0);
     try {
       playerRef.current?.destroy();
     } catch {
@@ -349,6 +357,23 @@ export default function MusicPlayer() {
   useEffect(() => {
     return subscribePlaylist(() => {
       // useSyncExternalStore already re-renders this component
+    });
+  }, []);
+
+  // Keep a ref to the latest goToTrack so the jump-request subscription below
+  // never calls a stale closure over the current track list.
+  const goToTrackRef = useRef(goToTrack);
+  useEffect(() => {
+    goToTrackRef.current = goToTrack;
+  });
+
+  // Consume "jump to track" requests coming from the queue in PlaylistPicker.
+  useEffect(() => {
+    return subscribePlayer(() => {
+      const jump = getPendingJump();
+      if (jump === null) return;
+      clearPendingJump();
+      goToTrackRef.current(jump);
     });
   }, []);
 

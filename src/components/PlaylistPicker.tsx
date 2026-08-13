@@ -11,6 +11,12 @@ import {
 } from "@/lib/playlistStore";
 import { PRESET_PLAYLISTS } from "@/lib/presets";
 import type { PresetPlaylist } from "@/lib/presets";
+import { TRACKS } from "@/lib/tracks";
+import {
+  getTrackIndex,
+  requestJump,
+  subscribePlayer,
+} from "@/lib/playerStore";
 
 function extractPlaylistId(input: string): string | null {
   const fromUrl = input.match(/[?&]list=([A-Za-z0-9_-]{10,60})/);
@@ -31,6 +37,11 @@ export default function PlaylistPicker() {
   const [error, setError] = useState("");
   const triggerRef = useRef<HTMLButtonElement>(null);
   const [anchor, setAnchor] = useState<{ top: number; right: number } | null>(null);
+
+  const tracks = customPlaylist?.tracks ?? TRACKS;
+  const currentIndex = useSyncExternalStore(subscribePlayer, getTrackIndex, () => 0);
+  const queueRef = useRef<HTMLUListElement>(null);
+  const activeItemRef = useRef<HTMLLIElement>(null);
 
   const updateAnchor = useCallback(() => {
     const trigger = triggerRef.current;
@@ -60,6 +71,16 @@ export default function PlaylistPicker() {
     if (!open) updateAnchor();
     setOpen((wasOpen) => !wasOpen);
   };
+
+  // Keep the active track in view when the queue opens or the track changes.
+  useEffect(() => {
+    if (!open) return;
+    const list = queueRef.current;
+    const item = activeItemRef.current;
+    if (list && item) {
+      list.scrollTop = item.offsetTop - list.clientHeight / 2 + item.clientHeight / 2;
+    }
+  }, [open, currentIndex]);
 
   const loadPreset = (preset: PresetPlaylist) => {
     saveCustomPlaylist({
@@ -121,25 +142,69 @@ export default function PlaylistPicker() {
             <div className="playlist-sheet-handle" aria-hidden="true" />
             <div className="playlist-popover-title">Playlists</div>
 
-        {customPlaylist && (
-          <div className="playlist-current">
-            <span className="playlist-current-name" title={customPlaylist.name}>
-              {customPlaylist.name}
-            </span>
-            <button
-              type="button"
-              className="playlist-btn playlist-btn-ghost"
-              onClick={() => {
-                clearCustomPlaylist();
-                setOpen(false);
-              }}
-            >
-              Default
-            </button>
-          </div>
-        )}
+            {customPlaylist && (
+              <div className="playlist-current">
+                <span className="playlist-current-name" title={customPlaylist.name}>
+                  {customPlaylist.name}
+                </span>
+                <button
+                  type="button"
+                  className="playlist-btn playlist-btn-ghost"
+                  onClick={() => {
+                    clearCustomPlaylist();
+                    setOpen(false);
+                  }}
+                >
+                  Default
+                </button>
+              </div>
+            )}
 
-        <div className="preset-list">
+            <div className="queue-section">
+              <div className="queue-header">
+                <span className="queue-header-title">
+                  Queue · {customPlaylist?.name ?? "Default"}
+                </span>
+                <span className="queue-header-count">
+                  {String(tracks.length).padStart(2, "0")}
+                </span>
+              </div>
+              <ul className="queue-list" ref={queueRef}>
+                {tracks.map((track, index) => (
+                  <li
+                    key={`${track.youtubeId}-${index}`}
+                    ref={index === currentIndex ? activeItemRef : undefined}
+                  >
+                    <button
+                      type="button"
+                      className={`queue-item${index === currentIndex ? " active" : ""}`}
+                      onClick={() => requestJump(index)}
+                    >
+                      <span className="queue-index">
+                        {String(index + 1).padStart(2, "0")}
+                      </span>
+                      <span className="queue-meta">
+                        <span className="queue-title">{track.title}</span>
+                        <span className="queue-artist">{track.artist || track.album}</span>
+                      </span>
+                      {index === currentIndex && (
+                        <span className="now-playing-bars active" aria-hidden="true">
+                          <i />
+                          <i />
+                          <i />
+                        </span>
+                      )}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="playlist-divider" />
+
+            <div className="playlist-section-label">Presets</div>
+
+            <div className="preset-list">
           {PRESET_PLAYLISTS.map((preset) => (
             <button
               key={preset.id}

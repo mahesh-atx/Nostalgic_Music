@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 
-export type Venue = "dhaba" | "saloon" | "farmers";
+export type Venue = "dhaba" | "saloon" | "farmers" | "tapri";
 
 const PARALLAX_MAX_SHIFT = 9; // px the background can drift
 const PARALLAX_SCALE = 1.06; // extra zoom so the edges never show
@@ -137,6 +137,14 @@ export default function BackgroundLayer({ venue }: { venue: Venue }) {
         }}
         className={`time-background venue-background farmers-background${venue === "farmers" ? " active" : ""}`}
         style={{ backgroundImage: 'url("/farmer.webp")' }}
+        aria-hidden="true"
+      />
+      <div
+        ref={(node) => {
+          layersRef.current[3] = node;
+        }}
+        className={`time-background venue-background tapri-background${venue === "tapri" ? " active" : ""}`}
+        style={{ backgroundImage: 'url("/tapri.webp")' }}
         aria-hidden="true"
       />
     </>

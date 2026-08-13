@@ -6,10 +6,13 @@ glassmorphism UI.
 
 ## Features
 
-- Switch between the time-aware Dhaba and Delux Saloon scenes without interrupting
-  playback; fully responsive down to phones and landscape mobile
+- Switch between the time-aware Dhaba, Delux Saloon, Delux Kisan (Farmers), and
+  Chai Tapri scenes without interrupting playback; fully responsive down to
+  phones and landscape mobile, with a gentle parallax on pointer/tilt
 - Hidden single-video YouTube player; 65-track static playlist with automatic
   next-track on end (`loadVideoById` + `ENDED` event, intros skipped via `start: 5`)
+- Scrollable track queue in the Playlist panel — the full active playlist in
+  order with the current track highlighted; click any track to jump to it
 - Track title/artist/album from a bundled tracklist — no dependence on player metadata
 - Local cover art (`public/covers/`), spinning album art, clickable seek bar
 - Live IST clock with blinking colon and a real "online" counter (each open
@@ -57,6 +60,7 @@ Open [http://localhost:3000](http://localhost:3000).
   fullscreen Dhaba backgrounds selected automatically from the current IST hour.
 - `public/delux-saloon.webp` — fullscreen Delux Saloon artwork.
 - `public/farmer.webp` — fullscreen Delux Kisan (Farmers) artwork.
+- `public/tapri.webp` — fullscreen Chai Tapri artwork.
 - `public/covers/` — per-track album art (YouTube thumbnails), pulled in by
   tracklist `cover` fields; tracks without art get a gradient placeholder.
 

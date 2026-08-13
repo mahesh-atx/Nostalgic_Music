@@ -23,6 +23,12 @@ const VENUE_COPY = {
     subtitle: "पुराने नग़मे, हरे खेत",
     caption: "Farming classics · always on",
   },
+  tapri: {
+    kicker: "संगीत और कड़क चाय",
+    title: ["डीलक्स", "टपरी"],
+    subtitle: "पुराने नग़मे, कड़क चाय",
+    caption: "Chai tapri · always on",
+  },
 } as const;
 
 export default function VenueScene() {
@@ -71,6 +77,20 @@ export default function VenueScene() {
             <path d="M12 13c0-3.4-2.2-5.6-5.4-5.6 0 3.4 2.2 5.6 5.4 5.6Z" />
           </svg>
           <span>Farmers</span>
+        </button>
+        <button
+          className={`venue-option${venue === "tapri" ? " active" : ""}`}
+          type="button"
+          aria-pressed={venue === "tapri"}
+          onClick={() => setVenue("tapri")}
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M5 8h13v6a5 5 0 0 1-5 5h-3a5 5 0 0 1-5-5V8Z" />
+            <path d="M18 10h2a2 2 0 0 1 0 4h-2" />
+            <path d="M8.5 5c0-1.2.7-2 1.5-2s1.5.8 1.5 2" />
+            <path d="M12.5 5c0-1.2.7-2 1.5-2s1.5.8 1.5 2" />
+          </svg>
+          <span>Tapri</span>
         </button>
       </div>
 
