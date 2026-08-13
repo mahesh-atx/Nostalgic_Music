@@ -18,6 +18,8 @@ import {
   subscribePlayer,
 } from "@/lib/playerStore";
 
+type PanelTab = "queue" | "playlists";
+
 function extractPlaylistId(input: string): string | null {
   const fromUrl = input.match(/[?&]list=([A-Za-z0-9_-]{10,60})/);
   if (fromUrl) return fromUrl[1];
@@ -32,6 +34,7 @@ export default function PlaylistPicker() {
     () => null
   );
   const [open, setOpen] = useState(false);
+  const [tab, setTab] = useState<PanelTab>("queue");
   const [value, setValue] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -40,7 +43,7 @@ export default function PlaylistPicker() {
 
   const tracks = customPlaylist?.tracks ?? TRACKS;
   const currentIndex = useSyncExternalStore(subscribePlayer, getTrackIndex, () => 0);
-  const queueRef = useRef<HTMLUListElement>(null);
+  const panelBodyRef = useRef<HTMLDivElement>(null);
   const activeItemRef = useRef<HTMLLIElement>(null);
 
   const updateAnchor = useCallback(() => {
@@ -48,7 +51,7 @@ export default function PlaylistPicker() {
     if (!trigger) return;
     const rect = trigger.getBoundingClientRect();
     setAnchor({
-      top: rect.bottom + 14,
+      top: Math.min(rect.bottom + 14, window.innerHeight - 120),
       right: Math.max(0, window.innerWidth - rect.right),
     });
   }, []);
@@ -72,15 +75,18 @@ export default function PlaylistPicker() {
     setOpen((wasOpen) => !wasOpen);
   };
 
-  // Keep the active track in view when the queue opens or the track changes.
+  // Keep the active track centered in the scroll area when the queue opens,
+  // the tab switches to it, or the track changes.
   useEffect(() => {
-    if (!open) return;
-    const list = queueRef.current;
+    if (!open || tab !== "queue") return;
+    const body = panelBodyRef.current;
     const item = activeItemRef.current;
-    if (list && item) {
-      list.scrollTop = item.offsetTop - list.clientHeight / 2 + item.clientHeight / 2;
-    }
-  }, [open, currentIndex]);
+    if (!body || !item) return;
+    const bodyRect = body.getBoundingClientRect();
+    const itemRect = item.getBoundingClientRect();
+    body.scrollTop +=
+      itemRect.top - bodyRect.top - bodyRect.height / 2 + itemRect.height / 2;
+  }, [open, tab, currentIndex]);
 
   const loadPreset = (preset: PresetPlaylist) => {
     saveCustomPlaylist({
@@ -140,108 +146,133 @@ export default function PlaylistPicker() {
             }
           >
             <div className="playlist-sheet-handle" aria-hidden="true" />
-            <div className="playlist-popover-title">Playlists</div>
 
-            {customPlaylist && (
-              <div className="playlist-current">
-                <span className="playlist-current-name" title={customPlaylist.name}>
-                  {customPlaylist.name}
-                </span>
-                <button
-                  type="button"
-                  className="playlist-btn playlist-btn-ghost"
-                  onClick={() => {
-                    clearCustomPlaylist();
-                    setOpen(false);
-                  }}
-                >
-                  Default
-                </button>
-              </div>
-            )}
+            <div className="playlist-tabs" role="tablist" aria-label="Playlist views">
+              <button
+                type="button"
+                role="tab"
+                aria-selected={tab === "queue"}
+                className={`playlist-tab${tab === "queue" ? " active" : ""}`}
+                onClick={() => setTab("queue")}
+              >
+                Queue
+              </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={tab === "playlists"}
+                className={`playlist-tab${tab === "playlists" ? " active" : ""}`}
+                onClick={() => setTab("playlists")}
+              >
+                Playlists
+              </button>
+            </div>
 
-            <div className="queue-section">
+            {tab === "queue" && (
               <div className="queue-header">
                 <span className="queue-header-title">
-                  Queue · {customPlaylist?.name ?? "Default"}
+                  {customPlaylist?.name ?? "Default"}
                 </span>
                 <span className="queue-header-count">
                   {String(tracks.length).padStart(2, "0")}
                 </span>
               </div>
-              <ul className="queue-list" ref={queueRef}>
-                {tracks.map((track, index) => (
-                  <li
-                    key={`${track.youtubeId}-${index}`}
-                    ref={index === currentIndex ? activeItemRef : undefined}
-                  >
-                    <button
-                      type="button"
-                      className={`queue-item${index === currentIndex ? " active" : ""}`}
-                      onClick={() => requestJump(index)}
+            )}
+
+            <div className="panel-body" ref={panelBodyRef}>
+              {tab === "queue" ? (
+                <ul className="queue-list">
+                  {tracks.map((track, index) => (
+                    <li
+                      key={`${track.youtubeId}-${index}`}
+                      ref={index === currentIndex ? activeItemRef : undefined}
                     >
-                      <span className="queue-index">
-                        {String(index + 1).padStart(2, "0")}
-                      </span>
-                      <span className="queue-meta">
-                        <span className="queue-title">{track.title}</span>
-                        <span className="queue-artist">{track.artist || track.album}</span>
-                      </span>
-                      {index === currentIndex && (
-                        <span className="now-playing-bars active" aria-hidden="true">
-                          <i />
-                          <i />
-                          <i />
+                      <button
+                        type="button"
+                        className={`queue-item${index === currentIndex ? " active" : ""}`}
+                        onClick={() => requestJump(index)}
+                      >
+                        <span className="queue-index">
+                          {String(index + 1).padStart(2, "0")}
                         </span>
-                      )}
+                        <span className="queue-meta">
+                          <span className="queue-title">{track.title}</span>
+                          <span className="queue-artist">{track.artist || track.album}</span>
+                        </span>
+                        {index === currentIndex && (
+                          <span className="now-playing-bars active" aria-hidden="true">
+                            <i />
+                            <i />
+                            <i />
+                          </span>
+                        )}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <>
+                  {customPlaylist && (
+                    <div className="playlist-current">
+                      <span className="playlist-current-name" title={customPlaylist.name}>
+                        {customPlaylist.name}
+                      </span>
+                      <button
+                        type="button"
+                        className="playlist-btn playlist-btn-ghost"
+                        onClick={() => {
+                          clearCustomPlaylist();
+                          setOpen(false);
+                        }}
+                      >
+                        Default
+                      </button>
+                    </div>
+                  )}
+
+                  <div className="playlist-section-label">Presets</div>
+
+                  <div className="preset-list">
+                    {PRESET_PLAYLISTS.map((preset) => (
+                      <button
+                        key={preset.id}
+                        type="button"
+                        className={`preset-item${customPlaylist?.id === preset.id ? " active" : ""}`}
+                        onClick={() => loadPreset(preset)}
+                      >
+                        <span className="preset-hindi">{preset.hindiName}</span>
+                        <span className="preset-sub">
+                          {preset.name} · {preset.tracks.length} songs
+                        </span>
+                        <span className="preset-desc">{preset.description}</span>
+                      </button>
+                    ))}
+                  </div>
+
+                  <div className="playlist-divider" />
+
+                  <form className="playlist-form" onSubmit={handleSubmit}>
+                    <input
+                      className="playlist-input"
+                      type="text"
+                      value={value}
+                      onChange={(event) => setValue(event.target.value)}
+                      placeholder="YouTube playlist link"
+                      maxLength={300}
+                    />
+                    <button
+                      className="playlist-btn"
+                      type="submit"
+                      disabled={loading || !value.trim()}
+                    >
+                      {loading ? "…" : "Load"}
                     </button>
-                  </li>
-                ))}
-              </ul>
+                  </form>
+
+                  {error && <div className="playlist-error">{error}</div>}
+                </>
+              )}
             </div>
-
-            <div className="playlist-divider" />
-
-            <div className="playlist-section-label">Presets</div>
-
-            <div className="preset-list">
-          {PRESET_PLAYLISTS.map((preset) => (
-            <button
-              key={preset.id}
-              type="button"
-              className={`preset-item${customPlaylist?.id === preset.id ? " active" : ""}`}
-              onClick={() => loadPreset(preset)}
-            >
-              <span className="preset-hindi">{preset.hindiName}</span>
-              <span className="preset-sub">
-                {preset.name} · {preset.tracks.length} songs
-              </span>
-              <span className="preset-desc">{preset.description}</span>
-            </button>
-          ))}
-        </div>
-
-        <div className="playlist-divider" />
-
-        <form className="playlist-form" onSubmit={handleSubmit}>
-          <input
-            className="playlist-input"
-            type="text"
-            value={value}
-            onChange={(event) => setValue(event.target.value)}
-            placeholder="YouTube playlist link"
-            maxLength={300}
-          />
-          <button
-            className="playlist-btn"
-            type="submit"
-            disabled={loading || !value.trim()}
-          >
-            {loading ? "…" : "Load"}
-          </button>
-        </form>
-
-        {error && <div className="playlist-error">{error}</div>}
           </div>
         </>,
         document.body

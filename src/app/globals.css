@@ -359,10 +359,10 @@ input:focus-visible,
   flex-direction: column;
   gap: 11px;
   width: 330px;
-  max-height: 80vh;
-  max-height: 80dvh;
+  max-height: min(80vh, calc(100vh - var(--popover-top, 0px) - 16px));
+  max-height: min(80dvh, calc(100dvh - var(--popover-top, 0px) - 16px));
   padding: 16px;
-  overflow-y: auto;
+  overflow: hidden;
   border: 1px solid rgba(255, 246, 231, 0.13);
   border-radius: 20px;
   color: var(--ivory);
@@ -373,16 +373,70 @@ input:focus-visible,
   text-align: left;
 }
 
-.playlist-popover-title {
-  color: var(--amber-bright);
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-}
-
 .playlist-sheet-handle {
   display: none;
+}
+
+/* Segmented Queue / Playlists tabs */
+.playlist-tabs {
+  display: flex;
+  gap: 3px;
+  flex: none;
+  padding: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.playlist-tab {
+  flex: 1;
+  min-height: 32px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 9px;
+  color: rgba(255, 246, 231, 0.62);
+  background: transparent;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  transition: color 160ms ease, background 160ms ease;
+}
+
+.playlist-tab:hover:not(.active) {
+  color: var(--ivory);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.playlist-tab.active {
+  color: #2b1c10;
+  background: linear-gradient(135deg, var(--amber-bright), var(--ivory));
+}
+
+/* The single scrollable region inside the panel (queue or playlists tab) */
+.panel-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+  overflow-y: auto;
+  padding: 2px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 246, 231, 0.2) transparent;
+}
+
+.panel-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.panel-body::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(255, 246, 231, 0.18);
+}
+
+.panel-body::-webkit-scrollbar-track {
+  background: transparent;
 }
 
 .playlist-current {
@@ -415,13 +469,6 @@ input:focus-visible,
 }
 
 /* Track queue */
-.queue-section {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  min-height: 0;
-}
-
 .queue-header {
   display: flex;
   align-items: center;
@@ -450,25 +497,7 @@ input:focus-visible,
   display: flex;
   flex-direction: column;
   gap: 2px;
-  max-height: 42vh;
-  max-height: 42dvh;
-  overflow-y: auto;
   padding: 2px;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255, 246, 231, 0.2) transparent;
-}
-
-.queue-list::-webkit-scrollbar {
-  width: 6px;
-}
-
-.queue-list::-webkit-scrollbar-thumb {
-  border-radius: 999px;
-  background: rgba(255, 246, 231, 0.18);
-}
-
-.queue-list::-webkit-scrollbar-track {
-  background: transparent;
 }
 
 .queue-item {
@@ -543,6 +572,8 @@ input:focus-visible,
 
 .queue-item .now-playing-bars {
   flex: none;
+  width: 13px;
+  height: 13px;
   margin-right: 2px;
   color: var(--amber-bright);
 }
