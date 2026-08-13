@@ -89,9 +89,9 @@ input:focus-visible,
   background-repeat: no-repeat;
   background-size: cover;
   opacity: 0;
-  transform: scale(1.002);
+  transform: scale(1.06);
   transition: opacity 650ms var(--ease-out);
-  will-change: opacity;
+  will-change: opacity, transform;
 }
 
 .venue-background.active {
@@ -114,6 +114,16 @@ input:focus-visible,
   z-index: -1;
   width: 128px;
   height: 72px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Hidden, visually-imperceptible preloaders for the adjacent track covers */
+.cover-preload {
+  position: absolute;
+  width: 1px;
+  height: 1px;
   overflow: hidden;
   opacity: 0;
   pointer-events: none;

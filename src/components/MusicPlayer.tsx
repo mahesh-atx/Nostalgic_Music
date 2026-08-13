@@ -62,6 +62,47 @@ function TrackArt({
   );
 }
 
+/**
+ * Eagerly loads only the covers for the tracks immediately before and after
+ * the current one, so skipping tracks never flashes a blank square — without
+ * pulling in the whole 60+ track library up front.
+ */
+function AdjacentCoverPreload({
+  tracks,
+  index,
+}: {
+  tracks: Track[];
+  index: number;
+}) {
+  if (tracks.length < 2) return null;
+
+  const count = tracks.length;
+  const adjacentIndexes = [...new Set(
+    [index + 1, index - 1]
+      .map((i) => ((i % count) + count) % count)
+      .filter((i) => i !== index)
+  )];
+
+  return (
+    <div className="cover-preload" aria-hidden="true">
+      {adjacentIndexes.map((i) => {
+        const cover = tracks[i]?.cover;
+        return cover ? (
+          <Image
+            key={tracks[i].youtubeId}
+            src={cover}
+            alt=""
+            width={84}
+            height={84}
+            loading="eager"
+            decoding="async"
+          />
+        ) : null;
+      })}
+    </div>
+  );
+}
+
 export default function MusicPlayer() {
   const [trackIndex, setTrackIndexState] = useState(0);
   const [status, setStatus] = useState<PlayerStatus>("loading");
@@ -374,6 +415,8 @@ export default function MusicPlayer() {
       <div className="yt-player-host">
         <div id="yt-player" />
       </div>
+
+      <AdjacentCoverPreload tracks={tracks} index={trackIndex} />
 
       <div className="player-container">
         <TrackArt key={track.youtubeId} track={track} isPlaying={isPlaying} />

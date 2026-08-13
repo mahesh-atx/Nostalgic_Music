@@ -53,9 +53,10 @@ Open [http://localhost:3000](http://localhost:3000).
 - `src/lib/playlistStore.ts` — browser-side storage of the custom playlist.
 - `src/lib/presets.ts` — the four curated deluxesaloon.space rotations (60 songs
   each, with titles/artists/albums and cover art) offered inside the picker.
-- `public/bg-marning.png`, `public/bg-sunset.png`, and `public/bg-night.png` —
+- `public/bg-marning.webp`, `public/bg-sunset.webp`, and `public/bg-night.webp` —
   fullscreen Dhaba backgrounds selected automatically from the current IST hour.
-- `public/delux-saloon.png` — fullscreen Delux Saloon artwork.
+- `public/delux-saloon.webp` — fullscreen Delux Saloon artwork.
+- `public/farmer.webp` — fullscreen Delux Kisan (Farmers) artwork.
 - `public/covers/` — per-track album art (YouTube thumbnails), pulled in by
   tracklist `cover` fields; tracks without art get a gradient placeholder.
 
